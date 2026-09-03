@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.yuugao.yugen.chat.ChatRequest;
 import me.yuugao.yugen.chat.ChatResponse;
 import me.yuugao.yugen.chat.FinishReason;
+import me.yuugao.yugen.exception.MalformedResponseException;
 import me.yuugao.yugen.exception.NetworkException;
 import me.yuugao.yugen.exception.ProviderException;
 import me.yuugao.yugen.exception.RateLimitException;
@@ -33,7 +34,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * HTTP/1.1 because the JDK test server does not speak h2c upgrade.
  */
 class OpenAiProviderTest {
-
     private HttpServer server;
     private String baseUrl;
     private final List<String> receivedBodies = new CopyOnWriteArrayList<>();
@@ -189,12 +189,21 @@ class OpenAiProviderTest {
     }
 
     @Test
-    void emptyChoicesFailWithProviderException() {
+    void emptyChoicesFailAsMalformedResponse() {
         respondWith(200, "{\"choices\":[],\"model\":\"m\"}");
 
         assertThatThrownBy(() -> provider(baseUrl, RetryPolicy.none()).chat(request()))
-                .isInstanceOf(ProviderException.class)
+                .isInstanceOf(MalformedResponseException.class)
                 .hasMessageContaining("No choices");
+    }
+
+    @Test
+    void unparseableBodyFailsAsMalformedResponse() {
+        respondWith(200, "<html>gateway error</html>");
+
+        assertThatThrownBy(() -> provider(baseUrl, RetryPolicy.none()).chat(request()))
+                .isInstanceOf(MalformedResponseException.class)
+                .hasMessageContaining("Unparseable");
     }
 
     @Test

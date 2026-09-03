@@ -6,7 +6,6 @@ package me.yuugao.yugen.exception;
  * failures without parsing message strings.
  */
 public class ProviderException extends YugenException {
-
     private final int statusCode;
 
     public ProviderException(int statusCode, String message) {

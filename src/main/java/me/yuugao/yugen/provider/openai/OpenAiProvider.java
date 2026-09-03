@@ -16,10 +16,7 @@ import me.yuugao.yugen.chat.ChatResponse;
 import me.yuugao.yugen.chat.FinishReason;
 import me.yuugao.yugen.chat.Message;
 import me.yuugao.yugen.chat.Usage;
-import me.yuugao.yugen.exception.NetworkException;
-import me.yuugao.yugen.exception.ProviderException;
-import me.yuugao.yugen.exception.RateLimitException;
-import me.yuugao.yugen.exception.YugenException;
+import me.yuugao.yugen.exception.*;
 import me.yuugao.yugen.internal.json.Json;
 import me.yuugao.yugen.provider.LlmProvider;
 import me.yuugao.yugen.retry.RetryPolicy;
@@ -32,7 +29,6 @@ import me.yuugao.yugen.retry.RetryPolicy;
  * OpenRouter, DeepSeek, Groq, Together, vLLM, LM Studio.
  */
 public final class OpenAiProvider implements LlmProvider {
-
     public static final String DEFAULT_BASE_URL = "https://api.openai.com/v1";
 
     private final String baseUrl;
@@ -133,15 +129,21 @@ public final class OpenAiProvider implements LlmProvider {
     }
 
     private ChatResponse fromWireFormat(String body) {
-        Map<?, ?> root = asMap(Json.parse(body));
+        Object parsed;
+        try {
+            parsed = Json.parse(body);
+        } catch (Json.JsonParseException e) {
+            throw new MalformedResponseException("Unparseable response body from " + name(), e);
+        }
+        Map<?, ?> root = asMap(parsed);
         if (root == null) {
-            throw new ProviderException(200, "Unexpected response shape from " + name());
+            throw new MalformedResponseException("Unexpected response shape from " + name());
         }
         List<?> choices = asList(root.get("choices"));
         if (choices == null || choices.isEmpty()) {
-            throw new ProviderException(200, "No choices in response from " + name());
+            throw new MalformedResponseException("No choices in response from " + name());
         }
-        Map<?, ?> choice = asMap(choices.get(0));
+        Map<?, ?> choice = asMap(choices.getFirst());
         Map<?, ?> message = choice == null ? null : asMap(choice.get("message"));
         Map<?, ?> usageMap = asMap(root.get("usage"));
 

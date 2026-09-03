@@ -16,7 +16,6 @@ import me.yuugao.yugen.exception.YugenException;
  * attempt number, which keeps the policy trivially unit-testable.
  */
 public final class RetryPolicy {
-
     /** Single attempt, no waiting: the null-object policy. */
     public static final RetryPolicy NONE = new RetryPolicy(1, 0, 1.0, 0);
 

@@ -11,7 +11,6 @@ import me.yuugao.yugen.chat.ChatResponse;
  * so existing implementations keep compiling.
  */
 public interface LlmProvider extends AutoCloseable {
-
     /** Stable provider identifier, e.g. {@code "openai"}. */
     String name();
 

@@ -24,7 +24,6 @@ import java.util.Map;
  * the implementation small enough to audit by reading.
  */
 public final class Json {
-
     private Json() {
     }
 

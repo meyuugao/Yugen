@@ -9,7 +9,6 @@ package me.yuugao.yugen.chat;
  * hierarchy together with the tool-calling phase.
  */
 public sealed interface Message {
-
     /** Wire role name, e.g. {@code "user"}. */
     String role();
 

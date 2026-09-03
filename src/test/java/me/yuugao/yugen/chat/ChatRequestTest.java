@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ChatRequestTest {
-
     @Test
     void buildsRequestWithConvenienceHelpers() {
         ChatRequest request = ChatRequest.builder()

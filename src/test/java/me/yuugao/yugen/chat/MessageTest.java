@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MessageTest {
-
     @Test
     void rolesMatchWireFormat() {
         assertThat(Message.system("s").role()).isEqualTo("system");

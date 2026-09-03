@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JsonTest {
-
     @Test
     void parsesPrimitives() {
         assertThat(Json.parse("null")).isNull();

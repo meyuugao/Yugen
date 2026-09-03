@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RetryPolicyTest {
-
     private static final NetworkException NETWORK = new NetworkException("boom", null);
 
     @Test

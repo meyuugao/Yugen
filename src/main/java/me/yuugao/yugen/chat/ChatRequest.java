@@ -2,13 +2,13 @@ package me.yuugao.yugen.chat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Immutable chat request. Optional parameters stay {@code null} so the
  * provider applies its own defaults instead of the library guessing them.
  */
 public final class ChatRequest {
-
     private final String model;
     private final List<Message> messages;
     private final Double temperature;
@@ -56,13 +56,14 @@ public final class ChatRequest {
         }
 
         public Builder messages(List<Message> messages) {
+            Objects.requireNonNull(messages, "messages");
             this.messages.clear();
             this.messages.addAll(messages);
             return this;
         }
 
         public Builder addMessage(Message message) {
-            this.messages.add(message);
+            this.messages.add(Objects.requireNonNull(message, "message"));
             return this;
         }
 

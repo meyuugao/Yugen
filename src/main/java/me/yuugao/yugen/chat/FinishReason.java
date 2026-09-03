@@ -2,7 +2,6 @@ package me.yuugao.yugen.chat;
 
 /** Why the model stopped generating, normalized across providers. */
 public enum FinishReason {
-
     STOP,
     LENGTH,
     CONTENT_FILTER,

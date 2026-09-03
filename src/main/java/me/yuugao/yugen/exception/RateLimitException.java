@@ -2,7 +2,6 @@ package me.yuugao.yugen.exception;
 
 /** HTTP 429 from the provider. Exposes {@code Retry-After} when present. */
 public class RateLimitException extends ProviderException {
-
     private final Long retryAfterSeconds;
 
     public RateLimitException(Long retryAfterSeconds, String message) {

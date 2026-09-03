@@ -7,10 +7,10 @@ import me.yuugao.yugen.provider.openai.OpenAiProvider;
 import me.yuugao.yugen.retry.RetryPolicy;
 
 /**
- * Entry point facade. Keeps the happy path one-liner-short while delegating
- * all real work to the configured {@link LlmProvider}.
+ * Entry point facade. Keeps the happy path one-liner-short while delegating all real work to the configured {@link LlmProvider}
  *
- * <pre>{@code
+ * <pre>
+ *     {@code
  * try (Yugen yugen = Yugen.builder()
  *         .openAi(System.getenv("OPENAI_API_KEY"))
  *         .retry(RetryPolicy.exponential(3, 500))
@@ -20,7 +20,6 @@ import me.yuugao.yugen.retry.RetryPolicy;
  * }</pre>
  */
 public final class Yugen implements AutoCloseable {
-
     private final LlmProvider provider;
     private final String defaultModel;
 
@@ -33,7 +32,9 @@ public final class Yugen implements AutoCloseable {
         return new Builder();
     }
 
-    /** Shorthand: single user prompt with the facade's default model. */
+    /**
+     * Shorthand: single user prompt with the facade's default model.
+     */
     public ChatResponse chat(String prompt) {
         return chat(ChatRequest.builder()
                 .model(defaultModel)
@@ -41,8 +42,8 @@ public final class Yugen implements AutoCloseable {
                 .build());
     }
 
-    public ChatResponse chat(ChatRequest request) {
-        return provider.chat(request);
+    public ChatResponse chat(ChatRequest chatRequest) {
+        return provider.chat(chatRequest);
     }
 
     public LlmProvider provider() {
@@ -60,7 +61,9 @@ public final class Yugen implements AutoCloseable {
         private String model = "gpt-4o-mini";
         private RetryPolicy retry = RetryPolicy.NONE;
 
-        /** Configures the OpenAI-compatible provider with an API key. */
+        /**
+         * Configures the OpenAI-compatible provider with an API key.
+         */
         public Builder openAi(String apiKey) {
             this.apiKey = apiKey;
             return this;
@@ -68,7 +71,7 @@ public final class Yugen implements AutoCloseable {
 
         /**
          * Points the client at any OpenAI-compatible endpoint:
-         * Ollama ({@code http://localhost:11434/v1}), OpenRouter, DeepSeek, Groq...
+         * Ollama ({@code http://localhost:11434/v1}). OpenRouter, DeepSeek, Groq...
          */
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
@@ -89,6 +92,7 @@ public final class Yugen implements AutoCloseable {
             if (apiKey == null || apiKey.isBlank()) {
                 throw new IllegalStateException("apiKey is required: call openAi(...)");
             }
+
             LlmProvider provider = OpenAiProvider.builder()
                     .apiKey(apiKey)
                     .baseUrl(baseUrl)
