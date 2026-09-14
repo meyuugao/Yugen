@@ -2,6 +2,7 @@ package me.yuugao.yugen;
 
 import me.yuugao.yugen.chat.ChatRequest;
 import me.yuugao.yugen.chat.ChatResponse;
+import me.yuugao.yugen.chat.ChatStream;
 import me.yuugao.yugen.provider.LlmProvider;
 import me.yuugao.yugen.provider.openai.OpenAiProvider;
 import me.yuugao.yugen.retry.RetryPolicy;
@@ -46,6 +47,41 @@ public final class Yugen implements AutoCloseable {
         return provider.chat(chatRequest);
     }
 
+    /**
+     * Streams the answer to a single user prompt, token by token.
+     *
+     * <p>Convenience overload of {@link #chatStream(ChatRequest)} using the
+     * facade's default model.
+     *
+     * <pre>{@code
+     * try (ChatStream stream = yugen.chatStream("Tell me a haiku.")) {
+     *     stream.forEach(System.out::print);
+     *     ChatResponse full = stream.await();
+     * }
+     * }</pre>
+     *
+     * @param prompt user message text
+     * @return live stream over the response; close it with try-with-resources
+     */
+    public ChatStream chatStream(String prompt) {
+        return chatStream(ChatRequest.builder()
+                .model(defaultModel)
+                .user(prompt)
+                .build());
+    }
+
+    /**
+     * Streams the answer to a fully specified request, token by token.
+     *
+     * @param request conversation and parameters to send
+     * @return live stream over the response; close it with try-with-resources
+     * @throws UnsupportedOperationException if the underlying provider
+     *         cannot stream
+     */
+    public ChatStream chatStream(ChatRequest request) {
+        return provider.chatStream(request);
+    }
+
     public LlmProvider provider() {
         return provider;
     }
@@ -56,6 +92,7 @@ public final class Yugen implements AutoCloseable {
     }
 
     public static final class Builder {
+        private LlmProvider customProvider;
         private String apiKey;
         private String baseUrl = OpenAiProvider.DEFAULT_BASE_URL;
         private String model = "gpt-4o-mini";
@@ -66,6 +103,22 @@ public final class Yugen implements AutoCloseable {
          */
         public Builder openAi(String apiKey) {
             this.apiKey = apiKey;
+            return this;
+        }
+
+        /**
+         * Uses a custom {@link LlmProvider} implementation instead of the
+         * built-in OpenAI-compatible one.
+         *
+         * <p>The injection point for alternative providers (Anthropic,
+         * native Ollama) and for test doubles. Closing the facade closes
+         * the injected provider as well.
+         *
+         * @param customProvider provider to route all calls through
+         * @return this builder
+         */
+        public Builder provider(LlmProvider customProvider) {
+            this.customProvider = customProvider;
             return this;
         }
 
@@ -88,7 +141,12 @@ public final class Yugen implements AutoCloseable {
             return this;
         }
 
+
         public Yugen build() {
+            if (customProvider != null) {
+                return new Yugen(customProvider, model);
+            }
+
             if (apiKey == null || apiKey.isBlank()) {
                 throw new IllegalStateException("apiKey is required: call openAi(...)");
             }
