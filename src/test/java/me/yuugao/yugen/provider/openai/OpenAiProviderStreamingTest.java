@@ -110,7 +110,7 @@ class OpenAiProviderStreamingTest {
     }
 
     @Test
-    void streamsTokensAndAggregates() throws IOException {
+    void streamsTokensAndAggregates() {
         streamHandler(out -> {
             sse(out, chunk(null, null));
             sse(out, chunk("Hel", null));
@@ -140,7 +140,7 @@ class OpenAiProviderStreamingTest {
 
     @Test
     @Timeout(10)
-    void deliversTokensAsTheyArrive() throws Exception {
+    void deliversTokensAsTheyArrive() {
         CountDownLatch firstTokenConsumed = new CountDownLatch(1);
         streamHandler(out -> {
             sse(out, chunk(null, null));
@@ -165,7 +165,7 @@ class OpenAiProviderStreamingTest {
     }
 
     @Test
-    void toleratesMissingDoneSentinel() throws IOException {
+    void toleratesMissingDoneSentinel() {
         streamHandler(out -> {
             sse(out, chunk("Hel", null));
             sse(out, chunk("lo", null));
@@ -180,7 +180,7 @@ class OpenAiProviderStreamingTest {
     }
 
     @Test
-    void missingUsageAndFinishReasonDegradeGracefully() throws IOException {
+    void missingUsageAndFinishReasonDegradeGracefully() {
         streamHandler(out -> {
             sse(out, chunk("hi", null));
             sse(out, "[DONE]");
@@ -211,7 +211,7 @@ class OpenAiProviderStreamingTest {
     }
 
     @Test
-    void unparseableChunkFailsAsMalformedResponse() throws IOException {
+    void unparseableChunkFailsAsMalformedResponse() {
         streamHandler(out -> {
             sse(out, chunk("Hel", null));
             sse(out, "{broken json");
